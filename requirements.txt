@@ -1,0 +1,20 @@
+torch>=2.2
+transformers>=4.56
+datasets>=2.19
+peft>=0.12
+accelerate>=0.34
+evaluate>=0.4
+sacrebleu>=2.4
+sentencepiece>=0.2
+bitsandbytes>=0.43; sys_platform == "linux"
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.6
+pyyaml>=6.0
+python-dotenv>=1.0
+typer>=0.12
+
+# optional extras (uncomment if needed)
+# unbabel-comet>=2.2      # COMET metric (eval.compute_comet: true)
+# fasttext-wheel>=0.9.2   # language-ID filtering (data.langid_model_path)
+# mlflow / wandb          # train.report_to

@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Secrets
+.env
+
+# Data, weights, outputs
+data/*
+!data/.gitkeep
+models/*
+!models/.gitkeep
+results/
+mlruns/
+wandb/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# Local run logs
+logs/

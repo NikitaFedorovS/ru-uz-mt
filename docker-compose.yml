@@ -1,0 +1,29 @@
+services:
+  api:
+    build:
+      context: .
+      args:
+        VARIANT: ${VARIANT:-gpu}
+    image: ru-uz-mt:${VARIANT:-gpu}
+    ports:
+      - "${PORT:-8000}:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      RU_UZ_MT__MODEL__ADAPTER_PATH: /app/models/ru-uz-lora
+    volumes:
+      - ./models:/app/models:ro
+      - hf-cache:/cache/huggingface
+    # GPU passthrough (requires NVIDIA Container Toolkit). For VARIANT=cpu remove this block.
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+
+volumes:
+  hf-cache:

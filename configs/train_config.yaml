@@ -1,0 +1,66 @@
+# Single source of truth for paths and hyperparameters.
+# Any field can be overridden with an env var: RU_UZ_MT__<SECTION>__<FIELD>
+# (e.g. RU_UZ_MT__TRAIN__NUM_EPOCHS=1). See .env.example.
+
+model:
+  base_model: facebook/nllb-200-distilled-600M
+  src_lang: rus_Cyrl
+  tgt_lang: uzn_Latn
+  # Adapter loaded by Translator / eval. null = use train.output_dir.
+  adapter_path: null
+  # auto | cuda | mps | cpu
+  device: auto
+
+data:
+  # "opus" = local Moses files produced by scripts/download_data.sh;
+  # "hf"   = a Hugging Face dataset with a `translation: {ru, uz}` column.
+  source: opus
+  raw_dir: data/raw
+  opus_corpora: [wikimedia, TED2020, QED, Tatoeba, tldr-pages]
+  dataset_name: null
+  dataset_config: null
+  max_len: 128          # max length in words (pre-tokenization filter)
+  min_len: 1
+  length_ratio: 3.0
+  normalize_uzbek_to_latin: true   # true: transliterate Cyrillic Uzbek; false: drop it
+  normalize_apostrophes: true      # unify o‘ / g‘ / ʼ variants
+  langid_model_path: null          # path to fastText lid.176.bin to enable language filtering
+  splits: [0.98, 0.01, 0.01]
+  max_test_pairs: 2000             # cap on val/test pairs (keeps eval fast)
+  processed_dir: data/processed
+  bidirectional: true
+  seed: 42
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: [q_proj, v_proj]
+  use_qlora: false
+
+train:
+  output_dir: models/ru-uz-lora
+  learning_rate: 2.0e-4
+  num_epochs: 3
+  batch_size: 16
+  grad_accumulation: 2
+  warmup_steps: 500
+  eval_steps: 1000
+  save_steps: 1000
+  logging_steps: 50
+  max_seq_len: 128      # tokenizer truncation length
+  pad_to_multiple_of: 8 # set to max_seq_len on Apple MPS (fixed shapes, no memory blow-up)
+  early_stopping_patience: 3
+  eval_bleu_samples: 200   # val pairs used for BLEU/chrF during training (0 = off)
+  report_to: none          # none | mlflow | wandb
+  seed: 42
+
+generate:
+  num_beams: 4
+  max_length: 128
+  batch_size: 16
+
+eval:
+  results_dir: results
+  compute_comet: false
+  comet_model: Unbabel/wmt22-comet-da
